@@ -11,7 +11,7 @@ export default function ActivitiesPage() {
   const { mutate: deleteActivity } = useMutation("DELETE", "/Activities", [
     "activities",
   ]);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   if (loading) return <p>Loading...</p>;
   if (error || !activities) return <p>{error || "No activities found."}</p>;
   return (
@@ -22,7 +22,15 @@ export default function ActivitiesPage() {
           <li key={activity.id}>
             {activity.name}{" "}
             {token ? (
-              <button onClick={() => deleteActivity(activity.id)}>
+              <button
+                onClick={() => {
+                  activity.creatorId === user.id
+                    ? deleteActivity(activity.id)
+                    : console.error(
+                        "you are not allowed to remove this activity"
+                      );
+                }}
+              >
                 Delete
               </button>
             ) : (

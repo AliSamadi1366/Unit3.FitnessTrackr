@@ -9,11 +9,27 @@ export default function ActivitiesPage() {
     error,
   } = useQuery("/Activities", "activities");
   const { mutate: deleteActivity } = useMutation("DELETE", "/Activities", [
+    "id",
+  ]);
+
+  const { mutate: addActivity } = useMutation("POST", "/Activities", [
     "activities",
   ]);
-  const { token, user } = useAuth();
+
+  const { token } = useAuth();
   if (loading) return <p>Loading...</p>;
   if (error || !activities) return <p>{error || "No activities found."}</p>;
+
+  const addnewActivity = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const newActivity = {
+      name: formData.get("name"),
+      description: formData.get("description"),
+    };
+    addActivity(newActivity);
+  };
+
   return (
     <>
       <h1>Activities</h1>
@@ -24,11 +40,7 @@ export default function ActivitiesPage() {
             {token ? (
               <button
                 onClick={() => {
-                  activity.creatorId === user.id
-                    ? deleteActivity(activity.id)
-                    : console.error(
-                        "you are not allowed to remove this activity"
-                      );
+                  deleteActivity(activity);
                 }}
               >
                 Delete
@@ -39,6 +51,23 @@ export default function ActivitiesPage() {
           </li>
         ))}
       </ul>
+      {token ? (
+        <form onSubmit={addnewActivity}>
+          <label>
+            Name:
+            <input name="name" type="text" />
+          </label>
+          <hr />
+          <label>
+            Description:
+            <input name="description" type="text" />
+          </label>
+          <hr />
+          <button type="submit">Add Activity</button>
+        </form>
+      ) : (
+        console.error("error")
+      )}
     </>
   );
 }

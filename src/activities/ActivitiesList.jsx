@@ -20,12 +20,12 @@ export default function ActivitiesList() {
   );
 }
 function ActivityListItem({ activity }) {
-  const { token } = useAuth;
+  const { token } = useAuth();
   const {
     mutate: deleteActivity,
     loading,
     error,
-  } = useMutation("DELETE", "/activities" + activity.id, ["activities"]);
+  } = useMutation("DELETE", "/activities/" + activity.id, ["activities"]);
   return (
     <li>
       <p>{activity.name}</p>
